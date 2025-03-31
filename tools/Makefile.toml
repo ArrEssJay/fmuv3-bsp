@@ -1,0 +1,64 @@
+[env]
+TARGET = "thumbv7em-none-eabihf"
+PROFILE = "release"
+# We can get these from cargo metadata but its painful
+BIN_TARGETS = { value = "clock blinky" }
+
+[tasks.build-target-binaries]
+script_runner = "@duckscript"
+script = '''
+bins = split ${BIN_TARGETS} " "
+target = get_env TARGET
+profile = get_env PROFILE
+
+echo "Building binaries: ${BIN_TARGETS}"
+# Start building the cargo command
+command = set "cargo build --target ${target} --profile ${profile}"
+
+# Add each binary as a --bin argument
+for bin in ${bins}
+    echo "Adding Binary: ${bin}"
+    command = concat ${command} " --bin " ${bin}
+end
+
+echo Executing: ${command}
+exec sh -c ${command}
+'''
+
+#will be built for default target
+[tasks.build-host-tools]
+command = "cargo"
+args = ["build", "--manifest-path", "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/tools/Cargo.toml"]
+
+
+[tasks.generate-target-apjs]
+script_runner = "@duckscript"
+script = '''
+target_elf_binaries = split ${BIN_TARGETS} " "
+package = get_env CARGO_MAKE_CRATE_NAME
+target = get_env TARGET
+profile = get_env PROFILE
+
+# Debug output
+echo "Binary targets: ${BIN_TARGETS}"
+echo "Package: ${package}"
+echo "Target: ${target}"
+echo "Profile: ${profile}"
+
+for elf in ${target_elf_binaries}
+    elf_file = concat ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY} "/target/" ${target} "/" ${profile} "/" ${elf}
+    if is_path_exists ${elf_file}
+        echo "Generating APJ for ${elf_file}"
+        exec ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/target/debug/apj_gen ${elf_file} ${package}
+    else
+        echo "Warning: File not found: ${elf_file} for ${elf}"
+    end
+end
+'''
+dependencies = ["build-target-binaries", "build-host-tools"]
+
+[tasks.build]
+disabled = true
+
+[tasks.default]
+alias = "generate-target-apjs"

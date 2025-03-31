@@ -1,0 +1,15 @@
+[package]
+name = "tools"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "apj_gen"
+path = "src/apj_gen.rs"
+
+[dependencies]
+crc = { version = "3.0", default-features = false }
+probe-rs = "0.27.0"
+base64 = "0.22.1"
+serde_json = "1.0.140"
+flate2 = "1.1.0"

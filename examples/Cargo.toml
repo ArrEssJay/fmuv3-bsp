@@ -1,0 +1,24 @@
+# cargo-features = ["profile-rustflags"]
+[package]
+name = "examples"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "blinky"
+test = false
+path = "src/blinky.rs"
+
+[[bin]]
+name = "clock"
+test = false
+path = "src/clock.rs"
+
+[dependencies]
+defmt = { version = "0.3.5" }
+fmuv3-bsp = { path = "../fmuv3-bsp", version = "0.1.0"}
+panic-halt = "1.0.0"
+cortex-m = "0.7.7"
+cortex-m-rt = { version = "0.7.3",  default-features = false  }
+stm32f4xx-hal = { version = "0.22.1", features = ["stm32f427"] }
+defmt-serial = "0.10.0"

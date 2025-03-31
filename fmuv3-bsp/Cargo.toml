@@ -1,0 +1,18 @@
+[package]
+name = "fmuv3-bsp"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "fmuv3_bsp"
+path = "src/lib.rs"
+test = false
+
+[dependencies.stm32f4xx-hal]
+version = "0.22.1"
+features = ["stm32f427",
+]
+
+
+
+
